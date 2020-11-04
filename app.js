@@ -2,6 +2,7 @@ const barContainer = document.getElementById('arrayBar');
 const randomizeBtn = document.getElementById('randomize');
 const quickSortBtn = document.getElementById('quicksort');
 const mergeSortBtn = document.getElementById('mergesort');
+const bubbleSortBtn = document.getElementById('bubblesort');
 const allButtons = document.querySelectorAll('#btnContainer button')
 
 const getRandom = (min, max) => {
@@ -12,7 +13,7 @@ randomArrayGenerator()
 
 function randomArrayGenerator()
 {
-    for(let i = 1; i <= 430; i++)
+    for(let i = 1; i <= 150; i++)
     {
     const newDiv = document.createElement("DIV");
     let randomNum = getRandom(5, 700);
@@ -41,10 +42,8 @@ randomizeBtn.addEventListener("click", ()=>{
 mergeSortBtn.addEventListener("click", ()=>{
     const allDivs = document.querySelectorAll('#arrayBar div')
     mergeSort(allDivs);
-    allButtons.forEach((button)=>{
-    button.disabled = true;
-    button.className = "btnDisabledClass"
-    })
+    disableBtn();
+    
 })
 quickSortBtn.addEventListener("click", ()=>{
     const allDivs = document.querySelectorAll('#arrayBar div')
@@ -55,14 +54,28 @@ quickSortBtn.addEventListener("click", ()=>{
         quickArray.push(parseInt(allDivs[i].getAttribute('data')));
     }
     mainQuickSort(allDivs, quickArray);
+    disableBtn();
+})
+bubbleSortBtn.addEventListener("click", ()=>{
+    const allDivs = document.querySelectorAll('#arrayBar div')
+    bubbleSort(allDivs);
+    disableBtn();
+})
 
+function disableBtn()
+{
     allButtons.forEach((button)=>{
     button.disabled = true;
     button.className = "btnDisabledClass"
     })
-})
-
-
+}
+function enableBtn()
+{
+    allButtons.forEach((button)=>{
+    button.disabled = false;
+    button.className = "btnClass"
+    })
+}
 async function bubbleSort(allDivs)
 {
     let bubbleArray = new Array
@@ -71,24 +84,58 @@ async function bubbleSort(allDivs)
         bubbleArray.push(parseInt(allDivs[i].getAttribute('data')));
     }
     var temp = 0;
-
-    for(let i = 0; i < bubbleArray.length; i++)
+    const animationArray = []
+    for(var i = 0; i < bubbleArray.length; i++)
     {
-        for(let j = 0; j < bubbleArray.length-1-i; j++)
+        for(var j = 0; j < bubbleArray.length-1-i; j++)
         {
             if(bubbleArray[j]>bubbleArray[j+1])
             {
                 temp = bubbleArray[j];
                 bubbleArray[j] = bubbleArray[j+1];
                 bubbleArray[j+1] = temp;
-                allDivs[j].setAttribute("style", `height:${bubbleArray[j]}px`);
-                allDivs[j].classList.add("black");
-                allDivs[j+1].setAttribute("style", `height:${bubbleArray[j+1]}px`);
-                allDivs[j+1].classList.add("black");
-                await sleep(0.01);
+                animationArray.push([j, j+1]);
+                animationArray.push([j, j+1]);
             }
         }
+        // console.log(i, j, j+1)
+        // console.log("second")
+        // animationArray.push("999")
+        
     }
+    var tracker = 149;
+    // console.log(animationArray)
+    for(i=0; i<animationArray.length; i++)
+    {
+
+        if(i%2==0)
+        {
+            allDivs[animationArray[i][0]].style.backgroundColor = "red"
+            allDivs[animationArray[i][1]].style.backgroundColor = "red"
+        }
+        else{
+            const barOne = allDivs[animationArray[i][0]]
+            const barTwo = allDivs[animationArray[i][1]]
+            var h1 = barOne.style.height
+            var h2 = barTwo.style.height
+            barOne.style.height = h2;
+            barTwo.style.height = h1;
+            barOne.style.backgroundColor = "white";
+            barTwo.style.backgroundColor = "white"
+            barOne.setAttribute("data",`${h2}`)
+            barTwo.setAttribute("data",`${h1}`)
+        }
+        if(animationArray[i][1] == tracker)
+        {
+            allDivs[tracker].style.backgroundColor = "orange";
+            tracker--;
+            tracker--;
+            
+            console.log("FOUND")
+        }
+        await sleep(1)  
+    }
+    enableBtn();
 }
 
 
@@ -123,10 +170,7 @@ async function mainQuickSort(allDivs, quickArray)
         allDivs[i].style.backgroundColor = "rgba(147, 231, 12, 0.863)";
         await sleep(1);
     }
-    allButtons.forEach((button)=>{
-        button.disabled = false;
-        button.className = "btnClass"
-    })
+    enableBtn();
     
 }
 
@@ -268,10 +312,7 @@ async function mergeSort(allDivs)
     {
         allDivs[i].style.backgroundColor = "rgba(147, 231, 12, 0.863)";
     }
-    allButtons.forEach((button)=>{
-        button.disabled = false;
-        button.className = "btnClass"
-    })
+    enableBtn();
 }
 
 
