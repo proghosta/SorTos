@@ -15,17 +15,18 @@ body
 
 .arrayBar
 {
-    position: absolute;
+    position: fixed;
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    top: 30px;
+    bottom: 30px;
     left: 230px;
+    right: auto;
 }
 .arrayBar div
 {
-    width: 5px;
-    margin: 0 1px;
+    width: 4px;
+    margin-left: 1px;
 }
 .white
 {
