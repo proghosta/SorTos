@@ -13,7 +13,7 @@ randomArrayGenerator()
 
 function randomArrayGenerator()
 {
-    for(let i = 1; i <= 150; i++)
+    for(let i = 1; i <= 60; i++)
     {
     const newDiv = document.createElement("DIV");
     let randomNum = getRandom(5, 700);
@@ -89,25 +89,23 @@ async function bubbleSort(allDivs)
     {
         for(var j = 0; j < bubbleArray.length-1-i; j++)
         {
+            // animationArray.push([j, j+1]);
+            
             if(bubbleArray[j]>bubbleArray[j+1])
             {
+                animationArray.push([j, j+1]);
+                animationArray.push([j, j+1]);
                 temp = bubbleArray[j];
                 bubbleArray[j] = bubbleArray[j+1];
                 bubbleArray[j+1] = temp;
-                animationArray.push([j, j+1]);
-                animationArray.push([j, j+1]);
             }
         }
-        // console.log(i, j, j+1)
-        // console.log("second")
-        // animationArray.push("999")
         
     }
-    var tracker = 149;
+    var tracker = 59;
     // console.log(animationArray)
     for(i=0; i<animationArray.length; i++)
     {
-
         if(i%2==0)
         {
             allDivs[animationArray[i][0]].style.backgroundColor = "red"
@@ -125,17 +123,38 @@ async function bubbleSort(allDivs)
             barOne.setAttribute("data",`${h2}`)
             barTwo.setAttribute("data",`${h1}`)
         }
-        if(animationArray[i][1] == tracker)
+        // if(animationArray[i][1] == tracker && animationArray[i][0] == tracker-1)
+        // {
+        //     if(animationArray[i][0] !== animationArray[i+1][0] || animationArray[i][1] !== animationArray[i+1][1])
+        //     {
+        //         console.log("FOUND", tracker)
+        //         allDivs[tracker].style.backgroundColor = "Orange"
+        //         tracker--;
+        //     }
+
+        // }
+        var greatestArrayElement = greatestArray(animationArray.slice(i))
+        if(animationArray[i][0] == greatestArrayElement[0] && animationArray[i][1] === greatestArrayElement[1])
         {
-            allDivs[tracker].style.backgroundColor = "orange";
-            tracker--;
-            tracker--;
-            
-            console.log("FOUND")
+            allDivs[greatestArrayElement[1]].style.backgroundColor = "orange"
+
         }
+        // console.log(greatestArrayElement)
         await sleep(1)  
     }
     enableBtn();
+}
+function greatestArray(array)
+{
+    var largest = [array[0][0], array[0][1]]
+    for(i = 1; i < array.length; i++)
+    {
+        if(array[i][0] > largest[0] && array[i][1] > largest[1])
+        {
+            largest = [array[i][0], array[i][1]]
+        }
+    }
+    return largest
 }
 
 
