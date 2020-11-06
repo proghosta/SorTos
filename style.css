@@ -26,8 +26,8 @@ body
 }
 .arrayBar div
 {
-    width: 5px;
-    margin-left: 1px;
+    width: 3px;
+    margin-left: 0px;
 }
 .white
 {
@@ -86,3 +86,9 @@ body
     background-color: white;
     border: 2px solid red;
 }
+
+#slider{
+    margin-top: 20px;
+    cursor: pointer;
+}
+

@@ -11,11 +11,13 @@ const heapSortBtn = document.getElementById("heapsort")
 const shellSortBtn = document.getElementById("shellsort")
 const timSortBtn = document.getElementById("timsort")
 const allButtons = document.querySelectorAll('#btnContainer button')
-const divNum = 196
+const slider = document.getElementById('slider')
+const divNum = 60
 const barWidth = 5
 const SORTED_COLOR = "orange";
 const COM_COLOR = "red"
 const FINAL_COLOR = "rgba(147, 231, 12, 0.863)"
+TIME_DELAY = 1;
 
 
 const getRandom = (min, max) => {
@@ -39,13 +41,10 @@ function randomArrayGenerator()
 }
 
 
-
-
 animationArray = new Array
 const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
-
 
 //button handlers
 randomizeBtn.addEventListener("click", ()=>{
@@ -54,6 +53,10 @@ randomizeBtn.addEventListener("click", ()=>{
     }
     randomArrayGenerator()
 })
+slider.oninput = ()=>{
+    TIME_DELAY = 101 - slider.value; 
+}
+
 mergeSortBtn.addEventListener("click", ()=>{
     const allDivs = document.querySelectorAll('#arrayBar div')
     mergeSort(allDivs);
@@ -61,13 +64,7 @@ mergeSortBtn.addEventListener("click", ()=>{
 })
 quickSortBtn.addEventListener("click", ()=>{
     const allDivs = document.querySelectorAll('#arrayBar div')
-    console.log(allDivs)
-    let quickArray = new Array
-    for(i = 0; i<allDivs.length; i++)
-    {
-        quickArray.push(parseInt(allDivs[i].getAttribute('data')));
-    }
-    mainQuickSort(allDivs, quickArray);
+    quickSort(allDivs);
     disableBtn();
 })
 bubbleSortBtn.addEventListener("click", ()=>{
@@ -108,22 +105,19 @@ heapSortBtn.addEventListener("click", ()=>{
 shellSortBtn.addEventListener("click", ()=>{
     const allDivs = document.querySelectorAll('#arrayBar div');
     shellSort(allDivs);
+    disableBtn();
 })
 
 timSortBtn.addEventListener("click", ()=>{
     const allDivs = document.querySelectorAll('#arrayBar div');
     timSort(allDivs,allDivs.length);
+    disableBtn();
 })
+
 
 async function timSort(allDivs, n)
 {
-    const timArray = new Array 
-    const animationArray = new Array
-    for(var i = 0; i < n; i++){
-        timArray.push(parseInt(allDivs[i].getAttribute("data")))
-    }
-    const testArray = timArray.slice()
-    console.log(testArray)
+    const timArray = arrayGenerator(allDivs)
     RUN = 32; 
     for(let i = 0; i < n; i+=RUN){
         insertionSortAlgo(timArray, i, Math.min(i+31, n-1), animationArray);
@@ -133,181 +127,101 @@ async function timSort(allDivs, n)
             let mid = left+size-1;
             if(mid > n){continue}
             let right = Math.min(left+2*size-1, n-1);
-
-            doMerge(timArray, left, mid, right, animationArray)
-        }
+            merge(timArray, left, mid, right, animationArray)}
     }
-    // doMerge(timArray, 0, 31, 64, animationArray)
-    // doMerge(timArray, 0, 63, timArray.length, animationArray)
-    console.log(animationArray)
-    console.log(timArray);
+
     for(let i = 0; i < animationArray.length; i++){
-        // insertionSort
-        if(animationArray[i][0] == 0){
-            if(animationArray[i][1]==0)
-            {
-                allDivs[animationArray[i][2]].style.backgroundColor = "red"
-                allDivs[animationArray[i][3]].style.backgroundColor = "red"
-            }
-            else if(animationArray[i][1]==1)
-            {
-                allDivs[animationArray[i][2]].style.backgroundColor = "orange"
-                allDivs[animationArray[i][3]].style.backgroundColor = "orange"
-            }
-            else if(animationArray[i][1] == 2){
-                allDivs[animationArray[i][2]].style.height = allDivs[animationArray[i][3]].style.height 
-                allDivs[animationArray[i][2]].setAttribute("data", `${allDivs[animationArray[i][3]].style.height}`)
-            }
-            else if(animationArray[i][1] == 3){
-                allDivs[animationArray[i][2]].style.height = `${animationArray[i][3]}px`
-                allDivs[animationArray[i][2]].setAttribute("data", `${animationArray[i][3]}`)
-            }
-        }
+        const [ELEMENT1, ELEMENT2, FLAG_SORT_TYPE, FLAG_OP] = animationArray[i];
 
-        //for the merge sort
-        else if(animationArray[i][0] == 1){
-            if(animationArray[i][1] == 2)
-            {
-                allDivs[animationArray[i][2]].style.height = `${animationArray[i][3]}px`
-                allDivs[animationArray[i][2]].setAttribute("data", `${animationArray[i][3]}`);
+        // InsertionSort Animation Part
+        if(FLAG_SORT_TYPE == 0){
+            switch(FLAG_OP){
+                case 0:
+                    divColor(allDivs, ELEMENT1, ELEMENT2, COM_COLOR);
+                    break;
+                case 1:
+                    divColor(allDivs, ELEMENT1, ELEMENT2, SORTED_COLOR);
+                    break;
+                case 2:
+                    allDivs[ELEMENT1].style.height = allDivs[ELEMENT2].style.height;
+                    allDivs[ELEMENT1].setAttribute("data", `${allDivs[ELEMENT2].style.height}`);
+                    break;
+                case 3:
+                    allDivs[ELEMENT1].style.height = `${ELEMENT2}px`;
+                    allDivs[ELEMENT1].setAttribute("data", `${ELEMENT2}`);
+                    break;
             }
-        else
-        {
-            if(animationArray[i][1] == 0){
-                console.log(i, animationArray[i])
-                allDivs[animationArray[i][2]].style.backgroundColor = 'red'
-                allDivs[animationArray[i][3]].style.backgroundColor = 'red'
-            }
-            else if(animationArray[i][1] == 1){
-                allDivs[animationArray[i][2]].style.backgroundColor = 'orange'
-                allDivs[animationArray[i][3]].style.backgroundColor = 'orange'
-            }
         }
-        }
-        await sleep(1)
-    }
-}
-
-function insertionSortAlgo(timArray, left, right, animationArray){
-    for(let i = left+1; i<=right; i++){
-        let temp = timArray[i];
-        let j = i -1;
-        while(j >= left && timArray[j] > temp){
-            animationArray.push([0,0, i, j])
-            animationArray.push([0,1, i, j])
-            animationArray.push([0,2, j+1, j])
-            timArray[j+1] = timArray[j];
-            j--;
-        }
-        animationArray.push([3, j+1, temp])
-        timArray[j+1] = temp;
-    }
-}
-function doMerge(mergeArr, lb, mid, ub, animationArray)
-{
-    var i = lb;
-    var j = mid+1;
-    var k = 0;
-    var newArray = new Array;
-    while(i <= mid && j <= ub){
-        animationArray.push([1, 0, i,j]);
-        animationArray.push([1, 1, i,j]);
-        if(mergeArr[i] <= mergeArr[j]){
-            animationArray.push([1, 2, lb+k, mergeArr[i]])
-            newArray[k++] = mergeArr[i++];
-        }
+        // MergeSort Animation Part
+        else if(FLAG_SORT_TYPE == 1){
+            const barFirst = allDivs[ELEMENT1];
+            const barSecond = allDivs[ELEMENT2];
+            if(FLAG_OP == 2){
+                barFirst.style.height = `${ELEMENT2}px`;
+                barFirst.setAttribute("data", `${ELEMENT2}`);}
         else{
-            animationArray.push([1, 2, lb+k, mergeArr[j]]);
-            newArray[k++] = mergeArr[j++];
+            if(FLAG_OP == 0){
+                barFirst.style.backgroundColor = COM_COLOR;
+                barSecond.style.backgroundColor = COM_COLOR;}
+            else if(FLAG_OP == 1){
+                barFirst.style.backgroundColor = SORTED_COLOR;
+                barSecond.style.backgroundColor = SORTED_COLOR;}
+            };
         }
+        await sleep(TIME_DELAY);
     }
-    while(i <= mid){
-        animationArray.push([1, 0, i,i])
-        animationArray.push([1, 1, i,i])
-        animationArray.push([1, 2, lb+k, mergeArr[i]])
-        newArray[k++] = mergeArr[i++];
-    }
-    
-    while(j<= ub){
-        animationArray.push([1, 0, j,j])
-        animationArray.push([1, 1, j,j])
-        animationArray.push([1, 2, lb+k, mergeArr[j]])
-        newArray[k++] = mergeArr[j++];
-    }
-    for(i = 0, j = lb; i < k; i++, j++)
-    {
-        mergeArr[j] = newArray[i];
-    }
+    divsFinalColor(allDivs);
 }
 
 
 async function shellSort(allDivs){
-    const shellArray = new Array 
-    for(var i = 0; i < allDivs.length; i++){
-        shellArray.push(parseInt(allDivs[i].getAttribute('data')))
-    }
+    const shellArray = arrayGenerator(allDivs);
     var size = shellArray.length
     const animations = new Array 
     var gap = Math.floor(size/2);
     for(gap; gap>=1; gap = Math.floor(gap/2)){
         for(var j = gap; j<size; j++){
             for(var i = j-gap; i >= 0; i = i - gap){
-                if(shellArray[i+gap] > shellArray[i]){
-                    break;
-                }
+                if(shellArray[i+gap] > shellArray[i]) break;
                 else{
-                    animations.push([i+gap, i])
-                    temp = shellArray[i+gap]
-                    shellArray[i+gap] = shellArray[i]
-                    shellArray[i] = temp
+                    animations.push([i+gap, i]);
+                    temp = shellArray[i+gap];
+                    shellArray[i+gap] = shellArray[i];
+                    shellArray[i] = temp;
                 }
             }
         }
     }
-    console.log(animations)
     for(var i = 0; i < animations.length; i++)
     {
         for(var j = 0; j < 2; j++){
-            // console.log(j)
-            let barFirst = allDivs[animations[i][0]]
-            let barSecond = allDivs[animations[i][1]]
+            const [FINDEX, LINDEX] = animations[i];
+            let barFirst = allDivs[FINDEX]
+            let barSecond = allDivs[LINDEX]
             if(j%2==0){
-                barFirst.style.backgroundColor = COM_COLOR
-                barSecond.style.backgroundColor = COM_COLOR
+                divColor(allDivs, FINDEX, LINDEX, COM_COLOR);
             }
-            else{
-                var barFirstHeight = barFirst.style.height;
-                barFirst.style.height = barSecond.style.height;
-                barSecond.style.height = barFirstHeight
-                barFirst.style.backgroundColor = SORTED_COLOR
-                barSecond.style.backgroundColor = SORTED_COLOR  
+            else{ 
+                swapDivHeight(barFirst, barSecond);
+                divColor(allDivs, FINDEX, LINDEX, SORTED_COLOR);
             }
-            await sleep(1)
+            await sleep(TIME_DELAY)
         }
     }
     divsFinalColor(allDivs)
-}
-async function divsFinalColor(allDivs)
-{
-    for(div of allDivs){
-        div.style.backgroundColor = FINAL_COLOR
-        await sleep(1)
-    }
-    enableBtn()
 }
 
 
 async function heapSort(allDivs)
 {
-    const heapArray = new Array 
-    for(var i = 0; i < allDivs.length; i++){
-        heapArray.push(parseInt(allDivs[i].getAttribute('data')))
-    }
-    var largestNonLeafNode = Math.floor(allDivs.length/2)
-    animationArray = new Array
+    const heapArray = arrayGenerator(allDivs);
+    animationArray = new Array;
+    var largestNonLeafNode = Math.floor(allDivs.length/2);
+
     for(var i = largestNonLeafNode; i>=1;i--){
-        MaxHeapify(heapArray, heapArray.length, i)
+        MaxHeapify(heapArray, heapArray.length, i);
     }
+    
     for(var i = heapArray.length; i>=1; i--){
         animationArray.push([i-1, 0])
         animationArray.push([i-1, 0])
@@ -318,190 +232,84 @@ async function heapSort(allDivs)
     }
 
     for(var i = 0; i< animationArray.length; i++)
-    {
-        let barFirst = allDivs[animationArray[i][0]]
-        let barSecond = allDivs[animationArray[i][1]]
-        if(i%2==0){
-            barFirst.style.backgroundColor = COM_COLOR
-            barSecond.style.backgroundColor = COM_COLOR
-        }
+    {   
+        const [FINDEX, LINDEX] = animationArray[i];
+        const barFirst = allDivs[FINDEX];
+        const barSecond = allDivs[LINDEX];
+        if(i%2==0){ divColor(allDivs, FINDEX, LINDEX, COM_COLOR); }
         else{
-            var barFirstHeight = barFirst.style.height;
-            barFirst.style.height = barSecond.style.height;
-            barSecond.style.height = barFirstHeight
-            barFirst.style.backgroundColor = SORTED_COLOR
-            barSecond.style.backgroundColor = SORTED_COLOR  
+            swapDivHeight(barFirst, barSecond);
+            divColor(allDivs, FINDEX, LINDEX, SORTED_COLOR);
         }
-        await sleep(1)
+        await sleep(TIME_DELAY)
     }
     divsFinalColor(allDivs)
 }
 
 
-function MaxHeapify(heapArray, n, i){
-    var largest = i;
-    var l = 2*i;
-    var r = 2*i+1;
-    if(l<=n && heapArray[l-1] > heapArray[largest-1]){
-        largest = l;
-    }
-    if(r<=n && heapArray[r-1]>heapArray[largest-1]){
-        largest = r;
-    }
-    if(largest != i){
-        animationArray.push([largest-1, i-1])
-        animationArray.push([largest-1, i-1])
-        var temp = heapArray[largest-1];
-        heapArray[largest-1] = heapArray[i-1]
-        heapArray[i-1] = temp;
-        MaxHeapify(heapArray, n , largest)
-    }
-}
-
-
-
-
-
 async function radixSort(allDivs)
 {
-    radixArray = new Array
-    for(i = 0 ; i < allDivs.length; i++){
-        radixArray.push(parseInt(allDivs[i].getAttribute("data")))
-    }
+    const radixArray = arrayGenerator(allDivs)
     var max = radixArray[0]
     for(var i = 0; i < radixArray.length; i++){
-        if(radixArray[i] > max){
-            max = radixArray[i]
-        }
+        if(radixArray[i] > max){max = radixArray[i];}
     }
     const animationArray = new Array
-    for(pos = 1; Math.floor(max/pos) > 0; pos*=10)
-    {
-        console.log(max/pos)
-        countingRadixSort(radixArray, radixArray.length, pos, animationArray);
-    }
+    for(pos = 1; Math.floor(max/pos) > 0; pos*=10){
+    countingRadixSort(radixArray, radixArray.length, pos, animationArray);}
     for(i = 0; i< animationArray.length; i++){
-        if(i%2==0){
-            allDivs[animationArray[i][0]].style.backgroundColor = "red";
-        }
-        else
-        {
-            allDivs[animationArray[i][0]].style.backgroundColor = "orange";
-            allDivs[animationArray[i][0]].style.height = `${animationArray[i][1]}px`
-        }
-        await sleep(1)
+        const [FINDEX, LINDEX] = animationArray[i];
+        if(i%2==0){ allDivs[FINDEX].style.backgroundColor = "red"; }
+        else{
+            allDivs[FINDEX].style.backgroundColor = "orange";
+            allDivs[FINDEX].style.height = `${LINDEX}px`;}
+        await sleep(TIME_DELAY)
     }
-    for(i = 0; i<allDivs.length; i++)
-    {
-        allDivs[i].style.backgroundColor = "rgba(147, 231, 12, 0.863)"
-        await sleep(1)
-    }
-    enableBtn()
+    divsFinalColor(allDivs);
 }
-function countingRadixSort(radixArray, n, pos, animationArray){
-    const count = new Array
-    const finalArr = new Array
-    for(var i = 0; i < n; i++){
-        finalArr.push(null)
-    }
-    for(var i = 0; i < 10; i++)
-    {
-        count.push(0);
-    }
-
-    for(i = 0; i<n; i++){
-        ++count[(Math.floor(radixArray[i]/pos))%10];
-    }
-
-    for(i = 1; i<=10; i++){
-        count[i] += count[i-1];
-    }
-
-    for(i = n -1; i>=0; i--){
-        finalArr[--count[(Math.floor(radixArray[i]/pos))%10]] = radixArray[i]
-        animationArray.push([count[(Math.floor(radixArray[i]/pos))%10], radixArray[i]])
-        animationArray.push([count[(Math.floor(radixArray[i]/pos))%10], radixArray[i]])
-    }
-    for(i = 0; i<n; i++){
-        radixArray[i] = finalArr[i]
-    }
-}
-
-
 
 
 async function countingSort(allDivs){
-    const countingArray = new Array
-    for(i = 0 ; i < allDivs.length; i++){
-        countingArray.push(parseInt(allDivs[i].getAttribute("data")))
-    }
+    const countingArray = arrayGenerator(allDivs);
     const animationArray = new Array
     var k = countingArray[0];
-
     for(var i = 0; i < countingArray.length; i++){
         if(countingArray[i]>k){
             k = countingArray[i]
-        }
-    }
+        }}
     const countArr = new Array
     const finalArr = new Array
-    for(i = 0; i<=k; i++)
-    {
-        countArr.push(0)
-    }
-    for(i=0; i<countingArray.length; i++)
-    {
-        finalArr.push(null)
-    }
-    for(i = 0; i < countingArray.length; i++){
-        countArr[countingArray[i]]+=1;
-    }
-    for(i = 1; i <= k; i++){
-        countArr[i] += countArr[i-1]
-    }
+    for(i = 0; i<=k; i++)countArr.push(null);
+    for(i=0; i<countingArray.length; i++)finalArr.push(null);
+    for(i = 0; i < countingArray.length; i++) countArr[countingArray[i]]+=1;
+    for(i = 1; i <= k; i++) countArr[i] += countArr[i-1];
     for(i = countingArray.length-1; i >= 0; i--){
-        
         finalArr[--countArr[countingArray[i]]] = countingArray[i]
         animationArray.push([countArr[countingArray[i]], countingArray[i]])
-        animationArray.push([countArr[countingArray[i]], countingArray[i]])
-    }
-
-    for(i = 0; i < countingArray.length; i++){
-        countingArray[i] = finalArr[i]
-    }
+        animationArray.push([countArr[countingArray[i]], countingArray[i]])}
+    for(i = 0; i < countingArray.length; i++)countingArray[i] = finalArr[i];
     for(i = 0; i < animationArray.length; i++)
     {
-        if(i%2==0){
-            allDivs[animationArray[i][0]].style.backgroundColor = "red";
-        }
-        else
-        {
-            allDivs[animationArray[i][0]].style.backgroundColor = "orange";
-            allDivs[animationArray[i][0]].style.height = `${animationArray[i][1]}px`;
-        }
-        await sleep(1)
+        const [FINDEX, LINDEX] = animationArray[i];
+        const barFirst = allDivs[FINDEX];
+        if(i%2==0){ barFirst.style.backgroundColor = "red"; }
+        else{
+            barFirst.style.backgroundColor = "orange";
+            barFirst.style.height = `${LINDEX}px`;
+            barFirst.setAttribute("data", LINDEX);}
+        await sleep(TIME_DELAY)
     }
-    for(i = 0; i<allDivs.length; i++){
-        allDivs[i].style.backgroundColor = 'rgba(147, 231, 12, 0.863)'
-        await sleep(1)
-    }
-    enableBtn()
+    divsFinalColor(allDivs);
 }
-
-
-
 
 async function insertionSort(allDivs)
 {
-    const insertionArray = new Array
-    for(let i = 0; i < allDivs.length; i++){
-        insertionArray.push(parseInt(allDivs[i].getAttribute('data')));
-    }
-    let animationArray = new Array
+    const insertionArray = arrayGenerator(allDivs)
+    const animationArray = new Array
+
     for(var i = 1; i < insertionArray.length; i++){
         var temp = insertionArray[i];
         var j = i - 1;
-
         while(j >= 0 && insertionArray[j] > temp){
             animationArray.push([0, i, j])
             animationArray.push([1, i, j])
@@ -512,45 +320,39 @@ async function insertionSort(allDivs)
         animationArray.push([3, j+1, temp])
         insertionArray[j+1] = temp;
     }
+
     for(i = 0; i< animationArray.length; i++)
     {
-        if(animationArray[i][0]==0)
-        {
-            allDivs[animationArray[i][1]].style.backgroundColor = "red"
-            allDivs[animationArray[i][2]].style.backgroundColor = "red"
+        const [FLAG_OP, ELEMENT1, ELEMENT2] = animationArray[i];
+        const barFirst = allDivs[ELEMENT1]
+        const barSecond = allDivs[ELEMENT2]
+        switch(FLAG_OP){
+            case 0:
+                divColor(allDivs, ELEMENT1, ELEMENT2, COM_COLOR);
+                break;
+            case 1:
+                divColor(allDivs, ELEMENT1, ELEMENT2, SORTED_COLOR);
+                break;
+            case 2:
+                barFirst.style.height = barSecond.style.height;
+                barFirst.setAttribute("data", `${barSecond.style.height}`);
+                break;
+            case 3: 
+                barFirst.style.height = `${ELEMENT2}px`
+                barFirst.setAttribute("data", `${ELEMENT2}`)
+                break;
         }
-        else if(animationArray[i][0]==1)
-        {
-            allDivs[animationArray[i][1]].style.backgroundColor = "orange"
-            allDivs[animationArray[i][2]].style.backgroundColor = "orange"
-        }
-        else if(animationArray[i][0] == 2){
-            allDivs[animationArray[i][1]].style.height = allDivs[animationArray[i][2]].style.height 
-            allDivs[animationArray[i][1]].setAttribute("data", `${allDivs[animationArray[i][2]].style.height}`)
-        }
-        else if(animationArray[i][0] == 3){
-            allDivs[animationArray[i][1]].style.height = `${animationArray[i][2]}px`
-            allDivs[animationArray[i][1]].setAttribute("data", `${animationArray[i][2]}`)
-        }
-        await sleep(1)
+        await sleep(TIME_DELAY)
     }
-    for(i = 0; i < allDivs.length; i++)
-    {
-        allDivs[i].style.backgroundColor = "rgba(147, 231, 12, 0.863)";
-        await sleep(1)
-    }
-    enableBtn();
-
+    divsFinalColor(allDivs);
 }
 
 
 async function selectionSort(allDivs)
 {
-    const selectionArray = new Array
-    for(let i = 0; i < allDivs.length; i++){
-        selectionArray.push(parseInt(allDivs[i].getAttribute('data')));
-    }
+    const selectionArray = arrayGenerator(allDivs);
     let animationArray = new Array
+
     for(let i = 0; i < selectionArray.length-1; i++){
         var min = i;
         for(var j = i+1; j < selectionArray.length; j++){
@@ -571,46 +373,152 @@ async function selectionSort(allDivs)
     
     for(i = 0; i < animationArray.length; i++)
     {
-
-
-        if(animationArray[i][0] == 0)
-        {
-            allDivs[animationArray[i][1]].style.backgroundColor = "red"
-            allDivs[animationArray[i][2]].style.backgroundColor = "red"
+        const [FLAG_OP, FINDEX, LINDEX] = animationArray[i];
+        const barFirst = allDivs[FINDEX];
+        const barSecond = allDivs[LINDEX];
+        switch(FLAG_OP){
+            case 0:
+                divColor(allDivs, FINDEX, LINDEX, COM_COLOR);
+                break;
+            case 1:
+                divColor(allDivs, FINDEX, LINDEX, "white");
+                break;
+            case 2:
+                swapDivHeight(barFirst, barSecond);
+                break;
+            case 3:
+                for(let k = 0; k <= FINDEX+1; k++){
+                    allDivs[k].style.backgroundColor = SORTED_COLOR;
+                }
+                break;
         }
-        else if(animationArray[i][0] == 1)
-        {
-            allDivs[animationArray[i][1]].style.backgroundColor = "white"
-            allDivs[animationArray[i][2]].style.backgroundColor = "white"
-        }
-        else if(animationArray[i][0] == 2)
-        {
-            const temp = allDivs[animationArray[i][1]].style.height
-            allDivs[animationArray[i][1]].style.height = allDivs[animationArray[i][2]].style.height
-            allDivs[animationArray[i][2]].style.height = temp;
-            allDivs[animationArray[i][2]].setAttribute("data", `${allDivs[animationArray[i][2]].style.height}`)
-            allDivs[animationArray[i][1]].setAttribute("data", `${allDivs[animationArray[i][1]].style.height}`)
-        }
-        else if(animationArray[i][0] == 3)
-        {
-            for(let k =0; k <= animationArray[i][1]+1; k++)
-            {
-                allDivs[k].style.backgroundColor = 'orange';
-            }
-        }
-
-        await sleep(4)
+        await sleep(TIME_DELAY)
     }
-    for(i = 0; i < allDivs.length; i++)
-    {
-        allDivs[i].style.backgroundColor = "rgba(147, 231, 12, 0.863)";
-        await sleep(1)
-    }
-    enableBtn();
+    divsFinalColor(allDivs);
 }
 
 
+async function bubbleSort(allDivs)
+{
+    let bubbleArray = arrayGenerator(allDivs)
+    var temp = 0;
+    const animationArray = new Array
+    for(var i = 0; i < bubbleArray.length; i++){
+        for(var j = 0; j < bubbleArray.length-1-i; j++){
+            animationArray.push([0, j, j+1]);
+            animationArray.push([1, j, j+1]);
+            if(bubbleArray[j]>bubbleArray[j+1]){
+                animationArray.push([2, j, j+1]);
+                temp = bubbleArray[j];
+                bubbleArray[j] = bubbleArray[j+1];
+                bubbleArray[j+1] = temp;}
+            }
+    }
 
+    for(i=0; i< animationArray.length; i++)
+    {
+        const [FLAG_OP, FINDEX, LINDEX] = animationArray[i];
+        const barFirst = allDivs[FINDEX];
+        const barSecond = allDivs[LINDEX];
+        switch(FLAG_OP){
+            case 0:
+                divColor(allDivs, FINDEX, LINDEX, COM_COLOR);
+                break;
+            case 1:
+                divColor(allDivs, FINDEX, LINDEX, "white");
+                break;
+            case 2:
+                var h1 = barFirst.style.height
+                var h2 = barSecond.style.height
+                barFirst.style.height = h2;
+                barSecond.style.height = h1;
+                barFirst.setAttribute("data",`${h2}`)
+                barSecond.setAttribute("data",`${h1}`)
+                break;
+        }
+        var [a,b] = greatestArray(animationArray.slice(i))
+        if(FINDEX == a && LINDEX === b){ allDivs[b].style.backgroundColor = SORTED_COLOR; }
+        await sleep(TIME_DELAY);
+    }
+    divsFinalColor(allDivs);
+}
+
+
+async function quickSort(allDivs)
+{
+    let quickArray = arrayGenerator(allDivs)
+    const animationArr = getQuickSortAlgoAnimation(quickArray);
+    for(i=0; i<animationArr.length; i++)
+    {
+        const [FINDEX, LINDEX] = animationArr[i];
+        const barFirst = allDivs[FINDEX];
+        const barSecond = allDivs[LINDEX];
+        if(i%2==0){ divColor(allDivs, FINDEX, LINDEX, COM_COLOR); }
+        else{
+            var h1 = barFirst.style.height
+            var h2 = barSecond.style.height
+            barFirst.style.height = h2;
+            barSecond.style.height = h1;
+            divColor(allDivs, FINDEX, LINDEX, SORTED_COLOR);
+            barFirst.setAttribute("data",`${h2}`)
+            barSecond.setAttribute("data",`${h1}`)
+        }
+        await sleep(TIME_DELAY);
+    }
+    divsFinalColor(allDivs);
+}
+
+
+async function mergeSort(allDivs)
+{
+    const mergeArray = arrayGenerator(allDivs)
+    const animationArray = getMergeAnimationArray(mergeArray);
+    console.log(animationArray)
+    for(i = 0; i < animationArray.length; i++)
+    {
+        const [ELEMENT1, ELEMENT2] = animationArray[i]
+        if((i+1)%3 == 0){
+            allDivs[ELEMENT1].style.height = `${ELEMENT2}px`
+            allDivs[ELEMENT1].setAttribute("data", `${ELEMENT2}`);}
+        else{
+            if(i%3 == 0){
+                divColor(allDivs, ELEMENT1, ELEMENT2, COM_COLOR);}
+            else{
+                divColor(allDivs, ELEMENT1, ELEMENT2, SORTED_COLOR);}}
+        await sleep(TIME_DELAY)
+    }
+    divsFinalColor(allDivs);
+}
+
+//auxiliary functions 
+async function divsFinalColor(allDivs)
+{
+    for(div of allDivs){
+        div.style.backgroundColor = FINAL_COLOR
+        await sleep(1)
+    }
+    enableBtn()
+}
+function divColor(divs, a, b, color){
+    divs[a].style.backgroundColor = color;
+    divs[b].style.backgroundColor = color;
+}
+function arrayGenerator(divs){
+    const array = new Array
+    for(let i = 0; i<divs.length; i++){
+        array.push(parseInt(divs[i].getAttribute('data')));}
+    return array;
+}
+function greatestArray(array)
+{
+    var largest = [array[0][1], array[0][2]]
+    for(i = 1; i < array.length; i++){
+        if(array[i][1] > largest[0] && array[i][2] > largest[1]){
+            largest = [array[i][1], array[i][2]]
+        }
+    }
+    return largest
+}
 function disableBtn()
 {
     allButtons.forEach((button)=>{
@@ -625,145 +533,54 @@ function enableBtn()
     button.className = "btnClass"
     })
 }
-
-
-async function bubbleSort(allDivs)
-{
-    let bubbleArray = new Array
-    for(i = 0; i<allDivs.length; i++)
-    {
-        bubbleArray.push(parseInt(allDivs[i].getAttribute('data')));
-    }
-    var temp = 0;
-    const animationArray = []
-    for(var i = 0; i < bubbleArray.length; i++)
-    {
-        for(var j = 0; j < bubbleArray.length-1-i; j++)
-        {
-            // animationArray.push([j, j+1]);
-            animationArray.push([0, j, j+1]);
-            animationArray.push([1, j, j+1]);
-            if(bubbleArray[j]>bubbleArray[j+1])
-            {
-                animationArray.push([2, j, j+1]);
-                temp = bubbleArray[j];
-                bubbleArray[j] = bubbleArray[j+1];
-                bubbleArray[j+1] = temp;
-            }
-        }
-        
-    }
-
-    for(i=0; i< animationArray.length; i++)
-    {
-        if(animationArray[i][0] == 0)
-        {
-            allDivs[animationArray[i][1]].style.backgroundColor = "red"
-            allDivs[animationArray[i][2]].style.backgroundColor = "red"
-        }
-        else if(animationArray[i][0] == 1)
-        {
-            allDivs[animationArray[i][1]].style.backgroundColor = "white"
-            allDivs[animationArray[i][2]].style.backgroundColor = "white"
-        }
-        else if(animationArray[i][0] == 2)
-        {
-            const barOne = allDivs[animationArray[i][1]]
-            const barTwo = allDivs[animationArray[i][2]]
-            var h1 = barOne.style.height
-            var h2 = barTwo.style.height
-            barOne.style.height = h2;
-            barTwo.style.height = h1;
-            barOne.setAttribute("data",`${h2}`)
-            barTwo.setAttribute("data",`${h1}`)
-        }
-        var greatestArrayElement = greatestArray(animationArray.slice(i))
-        if(animationArray[i][1] == greatestArrayElement[0] && animationArray[i][2] === greatestArrayElement[1])
-        {
-            // console.log(greatestArrayElement)
-            allDivs[greatestArrayElement[1]].style.backgroundColor = "orange"
-
-        }
-        await sleep(1)
-    }
-    for(i=0; i<allDivs.length; i++)
-    {
-        allDivs[i].style.backgroundColor ="rgba(147, 231, 12, 0.863)"
-        await sleep(0.01)
-    }
-    enableBtn();
-}
-function greatestArray(array)
-{
-    var largest = [array[0][1], array[0][2]]
-    for(i = 1; i < array.length; i++)
-    {
-        if(array[i][1] > largest[0] && array[i][2] > largest[1])
-        {
-            largest = [array[i][1], array[i][2]]
-        }
-    }
-    return largest
+function swapDivHeight(first, second){
+    var h1 = first.style.height;
+    var h2 = second.style.height;
+    first.style.height = h2;
+    second.style.height = h1;
+    first.setAttribute("data",`${h2}`);
+    second.setAttribute("data",`${h1}`);
 }
 
-
-async function mainQuickSort(allDivs, quickArray)
-{
-    const animationArr = getQuickSortAlgoAnimation(quickArray);
-    
-    for(i=0; i<animationArr.length; i++)
-    {
-        if(i%2==0)
-        {
-            allDivs[animationArr[i][0]].style.backgroundColor = "red"
-            allDivs[animationArr[i][1]].style.backgroundColor = "red"
-        }
-        else{
-            const barOne = allDivs[animationArr[i][0]]
-            const barTwo = allDivs[animationArr[i][1]]
-            var h1 = barOne.style.height
-            var h2 = barTwo.style.height
-            barOne.style.height = h2;
-            barTwo.style.height = h1;
-            barOne.style.backgroundColor = "orange";
-            barTwo.style.backgroundColor = "orange"
-            barOne.setAttribute("data",`${h2}`)
-            barTwo.setAttribute("data",`${h1}`)
-        }
-
-        await sleep(1)  
+//all SORTOS DEPENDENCIES
+function MaxHeapify(heapArray, n, i){
+    var largest = i;
+    var l = 2*i;
+    var r = 2*i+1;
+    if(l<=n && heapArray[l-1] > heapArray[largest-1]){
+        largest = l;
     }
-    for(i=0; i<allDivs.length;i++)
-    {
-        allDivs[i].style.backgroundColor = "rgba(147, 231, 12, 0.863)";
-        await sleep(1);
+    if(r<=n && heapArray[r-1]>heapArray[largest-1]){
+        largest = r;
     }
-    enableBtn();
-    
+    if(largest != i){
+        animationArray.push([largest-1, i-1])
+        animationArray.push([largest-1, i-1])
+        var temp = heapArray[largest-1];
+        heapArray[largest-1] = heapArray[i-1]
+        heapArray[i-1] = temp;
+        MaxHeapify(heapArray, n , largest)
+    }
 }
-
 function getQuickSortAlgoAnimation(quickArray)
 {
     const animationArray = []
-    quickSort(quickArray, 0, quickArray.length-1, animationArray);
+    quickRecursiveLoop(quickArray, 0, quickArray.length-1, animationArray);
     return animationArray;
 }
-
-function quickSort(quickArray, lb, ub, animationArray)
+function quickRecursiveLoop(quickArray, lb, ub, animationArray)
 {
     if(lb < ub) {
         var loc = partition(quickArray, lb, ub, animationArray);
-        quickSort(quickArray, lb, loc-1, animationArray);
-        quickSort(quickArray, loc+1, ub, animationArray);
+        quickRecursiveLoop(quickArray, lb, loc-1, animationArray);
+        quickRecursiveLoop(quickArray, loc+1, ub, animationArray);
     }
 }
-
 function partition(quickArray, lb, ub, animationArray)
 {
     var start = lb
     var end = ub
     var pivot = quickArray[lb];
-
     while(start < end)
     {
         while(quickArray[start] <= pivot && start < ub){
@@ -786,30 +603,49 @@ function partition(quickArray, lb, ub, animationArray)
     quickArray[end] = pivot;
     return end;
 }
-
-
-
-
-
-function getAnimationArr(mergeArr)
+function countingRadixSort(radixArray, n, pos, animationArray){
+    const count = new Array
+    const finalArr = new Array
+    for(var i = 0; i < n; i++)finalArr.push(null);
+    for(var i = 0; i < 10; i++) count.push(null);
+    for(i = 0; i<n; i++) ++count[(Math.floor(radixArray[i]/pos))%10];
+    for(i = 1; i<=10; i++) count[i] += count[i-1];
+    for(i = n -1; i>=0; i--){
+        finalArr[--count[(Math.floor(radixArray[i]/pos))%10]] = radixArray[i]
+        animationArray.push([count[(Math.floor(radixArray[i]/pos))%10], radixArray[i]])
+        animationArray.push([count[(Math.floor(radixArray[i]/pos))%10], radixArray[i]])
+    }
+    for(i = 0; i<n; i++){ radixArray[i] = finalArr[i];}
+}
+function getMergeAnimationArray(mergeArr)
 {
     const animationArray = []; 
-    console.log(mergeArr)
-    actualMergeSort(mergeArr, 0, mergeArr.length-1, animationArray);
+    mergeRecursiveLoop(mergeArr, 0, mergeArr.length-1, animationArray);
     return animationArray;
 }
-
-function actualMergeSort(mergeArr, lb, ub, animationArray)
+function mergeRecursiveLoop(mergeArr, lb, ub, animationArray)
 {
-    if(lb < ub)
-    {
-      var mid = Math.floor((ub+lb)/2);
-        actualMergeSort(mergeArr, lb, mid, animationArray);
-        actualMergeSort(mergeArr, mid+1, ub, animationArray);
-        merge(mergeArr, lb, mid, ub, animationArray);
+    if(lb < ub){
+        var mid = Math.floor((ub+lb)/2);
+        mergeRecursiveLoop(mergeArr, lb, mid, animationArray);
+        mergeRecursiveLoop(mergeArr, mid+1, ub, animationArray);
+        merge(mergeArr, lb, mid, ub, animationArray);}
+}
+function insertionSortAlgo(timArray, left, right, animationArray){
+    for(let i = left+1; i<=right; i++){
+        let temp = timArray[i];
+        let j = i -1;
+        while(j >= left && timArray[j] > temp){
+            animationArray.push([i, j, 0, 0])
+            animationArray.push([i, j, 0, 1])
+            animationArray.push([j+1, j, 0, 2])
+            timArray[j+1] = timArray[j];
+            j--;
+        }
+        animationArray.push([j+1, temp, 0, 3])
+        timArray[j+1] = temp;
     }
 }
-
 function merge(mergeArr, lb, mid, ub, animationArray)
 {
     var i = lb;
@@ -817,28 +653,28 @@ function merge(mergeArr, lb, mid, ub, animationArray)
     var k = 0;
     var newArray = new Array;
     while(i <= mid && j <= ub){
-        animationArray.push([i,j]);
-        animationArray.push([i,j]);
+        animationArray.push([i,j, 1, 0]);
+        animationArray.push([i,j, 1, 1]);
         if(mergeArr[i] <= mergeArr[j]){
-            animationArray.push([lb+k, mergeArr[i]])
+            animationArray.push([lb+k, mergeArr[i], 1, 2])
             newArray[k++] = mergeArr[i++];
         }
         else{
-            animationArray.push([lb+k, mergeArr[j]]);
+            animationArray.push([lb+k, mergeArr[j], 1, 2]);
             newArray[k++] = mergeArr[j++];
         }
     }
     while(i <= mid){
-        animationArray.push([i,i])
-        animationArray.push([i,i])
-        animationArray.push([lb+k, mergeArr[i]])
+        animationArray.push([i,i, 1, 0])
+        animationArray.push([i,i, 1, 0])
+        animationArray.push([lb+k, mergeArr[i], 1, 2])
         newArray[k++] = mergeArr[i++];
     }
     
-    while(j<= ub){
-        animationArray.push([j,j])
-        animationArray.push([j,j])
-        animationArray.push([lb+k, mergeArr[j]])
+    while(j <= ub){
+        animationArray.push([j,j, 1, 0])
+        animationArray.push([j,j, 1, 1])
+        animationArray.push([lb+k, mergeArr[j], 1, 2])
         newArray[k++] = mergeArr[j++];
     }
     for(i = 0, j = lb; i < k; i++, j++)
@@ -846,43 +682,3 @@ function merge(mergeArr, lb, mid, ub, animationArray)
         mergeArr[j] = newArray[i];
     }
 }
-
-
-async function mergeSort(allDivs)
-{
-    const mergeArray = new Array 
-    for(i = 0; i<allDivs.length; i++)
-    {
-        mergeArray.push(parseInt(allDivs[i].getAttribute('data')));
-    }
-    const animationArray = getAnimationArr(mergeArray);
-    for(i = 0; i < animationArray.length; i++)
-    {
-        if((i+1)%3 == 0)
-        {
-            allDivs[animationArray[i][0]].style.height = `${animationArray[i][1]}px`
-            allDivs[animationArray[i][0]].setAttribute("data", `${animationArray[i][1]}`);
-        }
-        else
-        {
-            if(i%3 == 0){
-                allDivs[animationArray[i][0]].style.backgroundColor = 'red'
-                allDivs[animationArray[i][1]].style.backgroundColor = 'red'
-            }
-            else{
-                allDivs[animationArray[i][0]].style.backgroundColor = 'orange'
-                allDivs[animationArray[i][1]].style.backgroundColor = 'orange'
-            }
-        }
-        await sleep(0.01)
-    }
-    for(i=0; i < allDivs.length; i++)
-    {
-        allDivs[i].style.backgroundColor = "rgba(147, 231, 12, 0.863)";
-        await sleep(1)
-    }
-    enableBtn();
-}
-
-
-
