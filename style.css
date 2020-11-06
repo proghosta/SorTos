@@ -3,6 +3,7 @@
     box-sizing: border;
     margin: 0;
     padding: 0;
+    
 }
 
 body
@@ -25,8 +26,8 @@ body
 }
 .arrayBar div
 {
-    width: 4px;
-    margin-left: 1px;
+    width: 5px;
+    margin-left: 0px;
 }
 .white
 {
@@ -34,7 +35,7 @@ body
 }
 .black
 {
-    background-color:  rgba(255, 166, 0, 0.788);
+    background-color:  rgb(255, 211, 116);
 }
 .green
 {

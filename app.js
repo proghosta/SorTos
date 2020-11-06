@@ -7,17 +7,26 @@ const selectionSortBtn = document.getElementById('selectionsort')
 const insertionSortBtn = document.getElementById('insertionsort')
 const countingSortBtn = document.getElementById('countingsort')
 const radixSortBtn = document.getElementById('radixsort')
+const heapSortBtn = document.getElementById("heapsort")
+const shellSortBtn = document.getElementById("shellsort")
 const allButtons = document.querySelectorAll('#btnContainer button')
 const divNum = 250
+const barWidth = 5
+const SORTED_COLOR = "orange";
+const COM_COLOR = "red"
+const FINAL_COLOR = "rgba(147, 231, 12, 0.863)"
+
+
 const getRandom = (min, max) => {
     return Math.floor(Math.random() * (max-min)+min);
 }
-
+const testArray = [15, 5, 20, 1, 17, 10 , 30]
 randomArrayGenerator()
 
 function randomArrayGenerator()
 {
-    for(let i = 1; i <= divNum; i++)
+    const divsNum = Math.floor((window.innerWidth - 280)/barWidth)
+    for(let i = 1; i <= divsNum; i++)
     {
     const newDiv = document.createElement("DIV");
     let randomNum = getRandom(5, 700);
@@ -88,6 +97,138 @@ radixSortBtn.addEventListener("click", ()=>{
     radixSort(allDivs);
     disableBtn()
 })
+
+heapSortBtn.addEventListener("click", ()=>{
+    const allDivs = document.querySelectorAll('#arrayBar div');
+    heapSort(allDivs);
+    disableBtn()
+})
+
+shellSortBtn.addEventListener("click", ()=>{
+    const allDivs = document.querySelectorAll('#arrayBar div');
+    shellSort(allDivs);
+})
+
+async function shellSort(allDivs){
+    const shellArray = new Array 
+    for(var i = 0; i < allDivs.length; i++){
+        shellArray.push(parseInt(allDivs[i].getAttribute('data')))
+    }
+    var size = shellArray.length
+    const animations = new Array 
+    var gap = Math.floor(size/2);
+    for(gap; gap>=1; gap = Math.floor(gap/2)){
+        for(var j = gap; j<size; j++){
+            for(var i = j-gap; i >= 0; i = i - gap){
+                if(shellArray[i+gap] > shellArray[i]){
+                    break;
+                }
+                else{
+                    animations.push([i+gap, i])
+                    temp = shellArray[i+gap]
+                    shellArray[i+gap] = shellArray[i]
+                    shellArray[i] = temp
+                }
+            }
+        }
+    }
+    console.log(animations)
+    for(var i = 0; i < animations.length; i++)
+    {
+        for(var j = 0; j < 2; j++){
+            // console.log(j)
+            let barFirst = allDivs[animations[i][0]]
+            let barSecond = allDivs[animations[i][1]]
+            if(j%2==0){
+                barFirst.style.backgroundColor = COM_COLOR
+                barSecond.style.backgroundColor = COM_COLOR
+            }
+            else{
+                var barFirstHeight = barFirst.style.height;
+                barFirst.style.height = barSecond.style.height;
+                barSecond.style.height = barFirstHeight
+                barFirst.style.backgroundColor = SORTED_COLOR
+                barSecond.style.backgroundColor = SORTED_COLOR  
+            }
+            await sleep(1)
+        }
+    }
+    divsFinalColor(allDivs)
+}
+async function divsFinalColor(allDivs)
+{
+    for(div of allDivs){
+        div.style.backgroundColor = FINAL_COLOR
+        await sleep(1)
+    }
+    enableBtn()
+}
+
+
+async function heapSort(allDivs)
+{
+    const heapArray = new Array 
+    for(var i = 0; i < allDivs.length; i++){
+        heapArray.push(parseInt(allDivs[i].getAttribute('data')))
+    }
+    var largestNonLeafNode = Math.floor(allDivs.length/2)
+    animationArray = new Array
+    for(var i = largestNonLeafNode; i>=1;i--){
+        MaxHeapify(heapArray, heapArray.length, i)
+    }
+    for(var i = heapArray.length; i>=1; i--){
+        animationArray.push([i-1, 0])
+        animationArray.push([i-1, 0])
+        var temp = heapArray[i-1];
+        heapArray[i-1] = heapArray[0];
+        heapArray[0] = temp;
+        MaxHeapify(heapArray, i-1, 1)
+    }
+
+    for(var i = 0; i< animationArray.length; i++)
+    {
+        let barFirst = allDivs[animationArray[i][0]]
+        let barSecond = allDivs[animationArray[i][1]]
+        if(i%2==0){
+            barFirst.style.backgroundColor = COM_COLOR
+            barSecond.style.backgroundColor = COM_COLOR
+        }
+        else{
+            var barFirstHeight = barFirst.style.height;
+            barFirst.style.height = barSecond.style.height;
+            barSecond.style.height = barFirstHeight
+            barFirst.style.backgroundColor = SORTED_COLOR
+            barSecond.style.backgroundColor = SORTED_COLOR  
+        }
+        await sleep(1)
+    }
+    divsFinalColor(allDivs)
+}
+
+
+function MaxHeapify(heapArray, n, i){
+    var largest = i;
+    var l = 2*i;
+    var r = 2*i+1;
+    if(l<=n && heapArray[l-1] > heapArray[largest-1]){
+        largest = l;
+    }
+    if(r<=n && heapArray[r-1]>heapArray[largest-1]){
+        largest = r;
+    }
+    if(largest != i){
+        animationArray.push([largest-1, i-1])
+        animationArray.push([largest-1, i-1])
+        var temp = heapArray[largest-1];
+        heapArray[largest-1] = heapArray[i-1]
+        heapArray[i-1] = temp;
+        MaxHeapify(heapArray, n , largest)
+    }
+}
+
+
+
+
 
 async function radixSort(allDivs)
 {
