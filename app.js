@@ -1,123 +1,74 @@
 const barContainer = document.getElementById('arrayBar');
 const randomizeBtn = document.getElementById('randomize');
-const quickSortBtn = document.getElementById('quicksort');
-const mergeSortBtn = document.getElementById('mergesort');
-const bubbleSortBtn = document.getElementById('bubblesort');
-const selectionSortBtn = document.getElementById('selectionsort')
-const insertionSortBtn = document.getElementById('insertionsort')
-const countingSortBtn = document.getElementById('countingsort')
-const radixSortBtn = document.getElementById('radixsort')
-const heapSortBtn = document.getElementById("heapsort")
-const shellSortBtn = document.getElementById("shellsort")
-const timSortBtn = document.getElementById("timsort")
+const quickSortBtn = document.getElementById('quickSort');
+const mergeSortBtn = document.getElementById('mergeSort');
+const bubbleSortBtn = document.getElementById('bubbleSort');
+const selectionSortBtn = document.getElementById('selectionSort')
+const insertionSortBtn = document.getElementById('insertionSort')
+const countingSortBtn = document.getElementById('countingSort')
+const radixSortBtn = document.getElementById('radixSort')
+const heapSortBtn = document.getElementById("heapSort")
+const shellSortBtn = document.getElementById("shellSort")
+const timSortBtn = document.getElementById("timSort")
 const allButtons = document.querySelectorAll('#btnContainer button')
+const allDivs = document.querySelectorAll('#arrayBar div');
 const slider = document.getElementById('slider')
 const divNum = 60
-const barWidth = 5
+const barWidth = 1
 const SORTED_COLOR = "orange";
 const COM_COLOR = "red"
 const FINAL_COLOR = "rgba(147, 231, 12, 0.863)"
-TIME_DELAY = 1;
+var TIME_DELAY = 1;
 
-
+// Random number between the interval
 const getRandom = (min, max) => {
     return Math.floor(Math.random() * (max-min)+min);
 }
-const testArray = [15, 5, 20, 1, 17, 10 , 30]
-randomArrayGenerator()
 
-function randomArrayGenerator()
-{
-    const divsNum = Math.floor((window.innerWidth - 280)/barWidth)
-    for(let i = 1; i <= divNum; i++)
-    {
-    const newDiv = document.createElement("DIV");
-    let randomNum = getRandom(5, 700);
-    newDiv.setAttribute("style", `height: ${randomNum}px`);
-    newDiv.setAttribute("data", `${randomNum}`);
-    newDiv.classList.add('white');
-    barContainer.appendChild(newDiv);
-    }
-}
-
-
-animationArray = new Array
+// Hacky way to mimic time.sleep() function 
 const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
+randomArrayGenerator();
 
-//button handlers
-randomizeBtn.addEventListener("click", ()=>{
+
+//EVENT HANDLERS
+randomizeBtn.onclick = ()=>{
     while(barContainer.firstChild){
         barContainer.removeChild(barContainer.firstChild)
     }
-    randomArrayGenerator()
-})
+    randomArrayGenerator();}
 slider.oninput = ()=>{
     TIME_DELAY = 101 - slider.value; 
 }
-
-mergeSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div')
-    mergeSort(allDivs);
-    disableBtn();
-})
-quickSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div')
-    quickSort(allDivs);
-    disableBtn();
-})
-bubbleSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div')
-    bubbleSort(allDivs);
-    disableBtn();
-})
-selectionSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div')
-    selectionSort(allDivs);
-    disableBtn();
-})
-
-insertionSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div');
-    insertionSort(allDivs);
-    disableBtn();
-})
-
-countingSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div');
-    countingSort(allDivs);
-    disableBtn();
-})
-
-radixSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div');
-    radixSort(allDivs);
-    disableBtn()
-})
-
-heapSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div');
-    heapSort(allDivs);
-    disableBtn()
-})
-
-shellSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div');
-    shellSort(allDivs);
-    disableBtn();
-})
-
-timSortBtn.addEventListener("click", ()=>{
-    const allDivs = document.querySelectorAll('#arrayBar div');
-    timSort(allDivs,allDivs.length);
-    disableBtn();
-})
+mergeSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div')
+    mergeSort(allDivs); disableBtn(); }
+quickSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div')
+    quickSort(allDivs); disableBtn();}
+bubbleSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div')
+    bubbleSort(allDivs); disableBtn();}
+selectionSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div')
+    selectionSort(allDivs); disableBtn();}
+insertionSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div');
+    insertionSort(allDivs); disableBtn();}
+countingSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div');
+    countingSort(allDivs); disableBtn();}
+radixSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div');
+    radixSort(allDivs); disableBtn()}
+heapSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div');
+    heapSort(allDivs); disableBtn()}
+shellSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div');
+    shellSort(allDivs); disableBtn();}
+timSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div');
+    timSort(allDivs); disableBtn();}
 
 
-async function timSort(allDivs, n)
+//Asynchronous Function to deal with 10 different SORTING ALGOS
+
+async function timSort(allDivs)
 {
-    const timArray = arrayGenerator(allDivs)
+    const timArray = arrayGenerator(allDivs);
+    var n = allDivs.length;
     RUN = 32; 
     for(let i = 0; i < n; i+=RUN){
         insertionSortAlgo(timArray, i, Math.min(i+31, n-1), animationArray);
@@ -491,6 +442,24 @@ async function mergeSort(allDivs)
 }
 
 //auxiliary functions 
+
+
+//Randomly generate different heights and shove it into the DOM 
+function randomArrayGenerator()
+{
+    const divsNum = Math.floor((window.innerWidth - 280)/barWidth)
+    for(let i = 1; i <= divsNum; i++)
+    {
+    const newDiv = document.createElement("DIV");
+    let randomNum = getRandom(5, 700);
+    newDiv.setAttribute("style", `height: ${randomNum}px`);
+    newDiv.setAttribute("data", `${randomNum}`);
+    newDiv.classList.add('white');
+    barContainer.appendChild(newDiv);
+    }
+}
+
+//Final SORTED-green color representation after every animation
 async function divsFinalColor(allDivs)
 {
     for(div of allDivs){
@@ -499,40 +468,37 @@ async function divsFinalColor(allDivs)
     }
     enableBtn()
 }
+//Setting div colors for animations
 function divColor(divs, a, b, color){
     divs[a].style.backgroundColor = color;
     divs[b].style.backgroundColor = color;
 }
+//Fresh array generator using the data attribute from each divs from the DOM
 function arrayGenerator(divs){
     const array = new Array
     for(let i = 0; i<divs.length; i++){
         array.push(parseInt(divs[i].getAttribute('data')));}
     return array;
 }
-function greatestArray(array)
-{
-    var largest = [array[0][1], array[0][2]]
-    for(i = 1; i < array.length; i++){
-        if(array[i][1] > largest[0] && array[i][2] > largest[1]){
-            largest = [array[i][1], array[i][2]]
-        }
-    }
-    return largest
-}
+//Disabling the buttons for the animation
 function disableBtn()
 {
     allButtons.forEach((button)=>{
     button.disabled = true;
     button.className = "btnDisabledClass"
     })
+
 }
+//Enabling the buttons after the animation
 function enableBtn()
 {
     allButtons.forEach((button)=>{
     button.disabled = false;
     button.className = "btnClass"
     })
+    allButtons[0].className = "btnClass randomBtn";
 }
+//Swapping two divs height
 function swapDivHeight(first, second){
     var h1 = first.style.height;
     var h2 = second.style.height;
@@ -541,8 +507,23 @@ function swapDivHeight(first, second){
     first.setAttribute("data",`${h2}`);
     second.setAttribute("data",`${h1}`);
 }
+// Searching the largest element from the array
+function greatestArray(array)
+{
+    var largest = [array[0][1], array[0][2]]
+    for(i = 1; i < array.length; i++)
+    {
+        if(array[i][1] > largest[0] && array[i][2] > largest[1])
+        {
+            largest = [array[i][1], array[i][2]]
+        }
+    }
+    return largest
+}
 
 //all SORTOS DEPENDENCIES
+
+//Heapify Method to heapify the Heapify Tree for the HEAP SORT
 function MaxHeapify(heapArray, n, i){
     var largest = i;
     var l = 2*i;
@@ -562,12 +543,14 @@ function MaxHeapify(heapArray, n, i){
         MaxHeapify(heapArray, n , largest)
     }
 }
+//Animation steps for the QUICK SORT
 function getQuickSortAlgoAnimation(quickArray)
 {
     const animationArray = []
     quickRecursiveLoop(quickArray, 0, quickArray.length-1, animationArray);
     return animationArray;
 }
+//Recursive loopfor QUICKSORT
 function quickRecursiveLoop(quickArray, lb, ub, animationArray)
 {
     if(lb < ub) {
@@ -576,6 +559,7 @@ function quickRecursiveLoop(quickArray, lb, ub, animationArray)
         quickRecursiveLoop(quickArray, loc+1, ub, animationArray);
     }
 }
+//QUICKSORT core running sub-routine
 function partition(quickArray, lb, ub, animationArray)
 {
     var start = lb
@@ -603,6 +587,7 @@ function partition(quickArray, lb, ub, animationArray)
     quickArray[end] = pivot;
     return end;
 }
+//CoutingSort used as a sub-routine in RADIX SORt
 function countingRadixSort(radixArray, n, pos, animationArray){
     const count = new Array
     const finalArr = new Array
@@ -617,12 +602,14 @@ function countingRadixSort(radixArray, n, pos, animationArray){
     }
     for(i = 0; i<n; i++){ radixArray[i] = finalArr[i];}
 }
+//Animation for MERGESORT
 function getMergeAnimationArray(mergeArr)
 {
     const animationArray = []; 
     mergeRecursiveLoop(mergeArr, 0, mergeArr.length-1, animationArray);
     return animationArray;
 }
+//Recursive loop for MERGESORT
 function mergeRecursiveLoop(mergeArr, lb, ub, animationArray)
 {
     if(lb < ub){
@@ -631,6 +618,7 @@ function mergeRecursiveLoop(mergeArr, lb, ub, animationArray)
         mergeRecursiveLoop(mergeArr, mid+1, ub, animationArray);
         merge(mergeArr, lb, mid, ub, animationArray);}
 }
+//For the TIMSORT to sort every (RUN) interval 
 function insertionSortAlgo(timArray, left, right, animationArray){
     for(let i = left+1; i<=right; i++){
         let temp = timArray[i];
@@ -646,6 +634,7 @@ function insertionSortAlgo(timArray, left, right, animationArray){
         timArray[j+1] = temp;
     }
 }
+//For the TIMSORT and MERGE SORT to merge the two either sub arrays
 function merge(mergeArr, lb, mid, ub, animationArray)
 {
     var i = lb;
