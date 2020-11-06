@@ -97,3 +97,95 @@ function arrayUpdate(arr, lb, k, newArray)
     //     // console.log(greatestArrayElement)
     //     await sleep(0.001)  
     // }
+
+
+    function merge(mergeArr, lb, mid, ub, animationArray)
+    {
+        var i = lb;
+        var j = mid+1;
+        var k = 0;
+        var newArray = new Array;
+        while(i <= mid && j <= ub){
+            animationArray.push([i,j]);
+            animationArray.push([i,j]);
+            if(mergeArr[i] <= mergeArr[j]){
+                animationArray.push([lb+k, mergeArr[i]])
+                newArray[k++] = mergeArr[i++];
+            }
+            else{
+                animationArray.push([lb+k, mergeArr[j]]);
+                newArray[k++] = mergeArr[j++];
+            }
+        }
+        while(i <= mid){
+            animationArray.push([i,i])
+            animationArray.push([i,i])
+            animationArray.push([lb+k, mergeArr[i]])
+            newArray[k++] = mergeArr[i++];
+        }
+        
+        while(j<= ub){
+            animationArray.push([j,j])
+            animationArray.push([j,j])
+            animationArray.push([lb+k, mergeArr[j]])
+            newArray[k++] = mergeArr[j++];
+        }
+        for(i = 0, j = lb; i < k; i++, j++)
+        {
+            mergeArr[j] = newArray[i];
+        }
+    }
+
+    if((i+1)%3 == 0)
+    {
+        allDivs[animationArray[i][0]].style.height = `${animationArray[i][1]}px`
+        allDivs[animationArray[i][0]].setAttribute("data", `${animationArray[i][1]}`);
+    }
+    else
+    {
+        if(i%3 == 0){
+            allDivs[animationArray[i][0]].style.backgroundColor = 'red'
+            allDivs[animationArray[i][1]].style.backgroundColor = 'red'
+        }
+        else{
+            allDivs[animationArray[i][0]].style.backgroundColor = 'orange'
+            allDivs[animationArray[i][1]].style.backgroundColor = 'orange'
+        }
+    }
+
+    function doMerge(mergeArr, lb, mid, ub, animationArray)
+{
+    var i = lb;
+    var j = mid+1;
+    var k = 0;
+    var newArray = new Array;
+    while(i <= mid && j <= ub){
+        animationArray.push([1, 0, i,j]);
+        animationArray.push([1, 1, i,j]);
+        if(mergeArr[i] <= mergeArr[j]){
+            animationArray.push([1, 2, lb+k, mergeArr[i]])
+            newArray[k++] = mergeArr[i++];
+        }
+        else{
+            animationArray.push([1, 2, lb+k, mergeArr[j]]);
+            newArray[k++] = mergeArr[j++];
+        }
+    }
+    while(i <= mid){
+        animationArray.push([1, 0, i,i])
+        animationArray.push([1, 1, i,i])
+        animationArray.push([1, 2, lb+k, mergeArr[i]])
+        newArray[k++] = mergeArr[i++];
+    }
+    
+    while(j<= ub){
+        animationArray.push([1, 0, j,j])
+        animationArray.push([1, 1, j,j])
+        animationArray.push([1, 2, lb+k, mergeArr[j]])
+        newArray[k++] = mergeArr[j++];
+    }
+    for(i = 0, j = lb; i < k; i++, j++)
+    {
+        mergeArr[j] = newArray[i];
+    }
+}

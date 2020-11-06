@@ -9,8 +9,9 @@ const countingSortBtn = document.getElementById('countingsort')
 const radixSortBtn = document.getElementById('radixsort')
 const heapSortBtn = document.getElementById("heapsort")
 const shellSortBtn = document.getElementById("shellsort")
+const timSortBtn = document.getElementById("timsort")
 const allButtons = document.querySelectorAll('#btnContainer button')
-const divNum = 250
+const divNum = 196
 const barWidth = 5
 const SORTED_COLOR = "orange";
 const COM_COLOR = "red"
@@ -26,7 +27,7 @@ randomArrayGenerator()
 function randomArrayGenerator()
 {
     const divsNum = Math.floor((window.innerWidth - 280)/barWidth)
-    for(let i = 1; i <= divsNum; i++)
+    for(let i = 1; i <= divNum; i++)
     {
     const newDiv = document.createElement("DIV");
     let randomNum = getRandom(5, 700);
@@ -44,7 +45,7 @@ animationArray = new Array
 const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
-// sortBtn.addEventListener("click", clickHandler)
+
 
 //button handlers
 randomizeBtn.addEventListener("click", ()=>{
@@ -108,6 +109,137 @@ shellSortBtn.addEventListener("click", ()=>{
     const allDivs = document.querySelectorAll('#arrayBar div');
     shellSort(allDivs);
 })
+
+timSortBtn.addEventListener("click", ()=>{
+    const allDivs = document.querySelectorAll('#arrayBar div');
+    timSort(allDivs,allDivs.length);
+})
+
+async function timSort(allDivs, n)
+{
+    const timArray = new Array 
+    const animationArray = new Array
+    for(var i = 0; i < n; i++){
+        timArray.push(parseInt(allDivs[i].getAttribute("data")))
+    }
+    const testArray = timArray.slice()
+    console.log(testArray)
+    RUN = 32; 
+    for(let i = 0; i < n; i+=RUN){
+        insertionSortAlgo(timArray, i, Math.min(i+31, n-1), animationArray);
+    }
+    for(let size = RUN; size < n; size = 2*size){
+        for(let left = 0; left < n ; left += 2*size){
+            let mid = left+size-1;
+            if(mid > n){continue}
+            let right = Math.min(left+2*size-1, n-1);
+
+            doMerge(timArray, left, mid, right, animationArray)
+        }
+    }
+    // doMerge(timArray, 0, 31, 64, animationArray)
+    // doMerge(timArray, 0, 63, timArray.length, animationArray)
+    console.log(animationArray)
+    console.log(timArray);
+    for(let i = 0; i < animationArray.length; i++){
+        // insertionSort
+        if(animationArray[i][0] == 0){
+            if(animationArray[i][1]==0)
+            {
+                allDivs[animationArray[i][2]].style.backgroundColor = "red"
+                allDivs[animationArray[i][3]].style.backgroundColor = "red"
+            }
+            else if(animationArray[i][1]==1)
+            {
+                allDivs[animationArray[i][2]].style.backgroundColor = "orange"
+                allDivs[animationArray[i][3]].style.backgroundColor = "orange"
+            }
+            else if(animationArray[i][1] == 2){
+                allDivs[animationArray[i][2]].style.height = allDivs[animationArray[i][3]].style.height 
+                allDivs[animationArray[i][2]].setAttribute("data", `${allDivs[animationArray[i][3]].style.height}`)
+            }
+            else if(animationArray[i][1] == 3){
+                allDivs[animationArray[i][2]].style.height = `${animationArray[i][3]}px`
+                allDivs[animationArray[i][2]].setAttribute("data", `${animationArray[i][3]}`)
+            }
+        }
+
+        //for the merge sort
+        else if(animationArray[i][0] == 1){
+            if(animationArray[i][1] == 2)
+            {
+                allDivs[animationArray[i][2]].style.height = `${animationArray[i][3]}px`
+                allDivs[animationArray[i][2]].setAttribute("data", `${animationArray[i][3]}`);
+            }
+        else
+        {
+            if(animationArray[i][1] == 0){
+                console.log(i, animationArray[i])
+                allDivs[animationArray[i][2]].style.backgroundColor = 'red'
+                allDivs[animationArray[i][3]].style.backgroundColor = 'red'
+            }
+            else if(animationArray[i][1] == 1){
+                allDivs[animationArray[i][2]].style.backgroundColor = 'orange'
+                allDivs[animationArray[i][3]].style.backgroundColor = 'orange'
+            }
+        }
+        }
+        await sleep(1)
+    }
+}
+
+function insertionSortAlgo(timArray, left, right, animationArray){
+    for(let i = left+1; i<=right; i++){
+        let temp = timArray[i];
+        let j = i -1;
+        while(j >= left && timArray[j] > temp){
+            animationArray.push([0,0, i, j])
+            animationArray.push([0,1, i, j])
+            animationArray.push([0,2, j+1, j])
+            timArray[j+1] = timArray[j];
+            j--;
+        }
+        animationArray.push([3, j+1, temp])
+        timArray[j+1] = temp;
+    }
+}
+function doMerge(mergeArr, lb, mid, ub, animationArray)
+{
+    var i = lb;
+    var j = mid+1;
+    var k = 0;
+    var newArray = new Array;
+    while(i <= mid && j <= ub){
+        animationArray.push([1, 0, i,j]);
+        animationArray.push([1, 1, i,j]);
+        if(mergeArr[i] <= mergeArr[j]){
+            animationArray.push([1, 2, lb+k, mergeArr[i]])
+            newArray[k++] = mergeArr[i++];
+        }
+        else{
+            animationArray.push([1, 2, lb+k, mergeArr[j]]);
+            newArray[k++] = mergeArr[j++];
+        }
+    }
+    while(i <= mid){
+        animationArray.push([1, 0, i,i])
+        animationArray.push([1, 1, i,i])
+        animationArray.push([1, 2, lb+k, mergeArr[i]])
+        newArray[k++] = mergeArr[i++];
+    }
+    
+    while(j<= ub){
+        animationArray.push([1, 0, j,j])
+        animationArray.push([1, 1, j,j])
+        animationArray.push([1, 2, lb+k, mergeArr[j]])
+        newArray[k++] = mergeArr[j++];
+    }
+    for(i = 0, j = lb; i < k; i++, j++)
+    {
+        mergeArr[j] = newArray[i];
+    }
+}
+
 
 async function shellSort(allDivs){
     const shellArray = new Array 
