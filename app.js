@@ -13,8 +13,9 @@ const timSortBtn = document.getElementById("timSort")
 const allButtons = document.querySelectorAll('#btnContainer button')
 const allDivs = document.querySelectorAll('#arrayBar div');
 const slider = document.getElementById('slider')
+const divSize = document.getElementById('divSize')
 const divNum = 60
-const barWidth = 1
+barWidth = 1
 const SORTED_COLOR = "orange";
 const COM_COLOR = "red"
 const FINAL_COLOR = "rgba(147, 231, 12, 0.863)"
@@ -33,13 +34,21 @@ randomArrayGenerator();
 
 
 //EVENT HANDLERS
-randomizeBtn.onclick = ()=>{
+randomizeBtn.onclick = ()=> arrayBarUpdate();
+slider.oninput = ()=>{
+    TIME_DELAY = 201 - slider.value; 
+}
+divSize.oninput = ()=>{
+    document.documentElement.style.setProperty('--div-width', `${divSize.value}px`);
+    barWidth = divSize.value;
+    arrayBarUpdate();
+}
+function arrayBarUpdate(){
     while(barContainer.firstChild){
         barContainer.removeChild(barContainer.firstChild)
     }
-    randomArrayGenerator();}
-slider.oninput = ()=>{
-    TIME_DELAY = 101 - slider.value; 
+    
+    randomArrayGenerator();
 }
 mergeSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar div')
     mergeSort(allDivs); disableBtn(); }
@@ -68,6 +77,7 @@ timSortBtn.onclick = ()=>{ const allDivs = document.querySelectorAll('#arrayBar 
 async function timSort(allDivs)
 {
     const timArray = arrayGenerator(allDivs);
+    const animationArray = new Array
     var n = allDivs.length;
     RUN = 32; 
     for(let i = 0; i < n; i+=RUN){
@@ -454,7 +464,7 @@ function randomArrayGenerator()
     let randomNum = getRandom(5, 700);
     newDiv.setAttribute("style", `height: ${randomNum}px`);
     newDiv.setAttribute("data", `${randomNum}`);
-    newDiv.classList.add('white');
+    newDiv.style.backgroundColor = "white";
     barContainer.appendChild(newDiv);
     }
 }
@@ -462,8 +472,16 @@ function randomArrayGenerator()
 //Final SORTED-green color representation after every animation
 async function divsFinalColor(allDivs)
 {
-    for(div of allDivs){
-        div.style.backgroundColor = FINAL_COLOR
+    // for(div of allDivs){
+    //     div.style.backgroundColor = FINAL_COLOR
+    //     await sleep(1)
+    // }
+    for(let i = 0; i < allDivs.length; ){
+        for(let j = 0; j < 5; j++)
+        {
+            allDivs[j+i].style.backgroundColor = FINAL_COLOR
+            i++;
+        }
         await sleep(1)
     }
     enableBtn()
@@ -487,6 +505,8 @@ function disableBtn()
     button.disabled = true;
     button.className = "btnDisabledClass"
     })
+    divSize.disabled = true;
+    divSize.className = "inputDisabled"
 
 }
 //Enabling the buttons after the animation
@@ -497,6 +517,8 @@ function enableBtn()
     button.className = "btnClass"
     })
     allButtons[0].className = "btnClass randomBtn";
+    divSize.className="";
+    divSize.disabled = false;
 }
 //Swapping two divs height
 function swapDivHeight(first, second){
