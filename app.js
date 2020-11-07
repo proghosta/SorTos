@@ -473,10 +473,6 @@ function randomArrayGenerator()
 async function divsFinalColor(allDivs)
 {
     let size = allDivs.length
-    // for(div of allDivs){
-    //     div.style.backgroundColor = FINAL_COLOR;
-    //     await sleep(1)
-    // }
     for(let i = 0; i < size; ){
         for(j = 0; j<4 && i < size; j++)
         {
