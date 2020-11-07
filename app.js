@@ -15,7 +15,7 @@ const allDivs = document.querySelectorAll('#arrayBar div');
 const slider = document.getElementById('slider')
 const divSize = document.getElementById('divSize')
 const divNum = 60
-barWidth = 1
+var barWidth = 1
 const SORTED_COLOR = "orange";
 const COM_COLOR = "red"
 const FINAL_COLOR = "rgba(147, 231, 12, 0.863)"
@@ -472,19 +472,20 @@ function randomArrayGenerator()
 //Final SORTED-green color representation after every animation
 async function divsFinalColor(allDivs)
 {
+    let size = allDivs.length
     // for(div of allDivs){
-    //     div.style.backgroundColor = FINAL_COLOR
+    //     div.style.backgroundColor = FINAL_COLOR;
     //     await sleep(1)
     // }
-    for(let i = 0; i < allDivs.length; ){
-        for(let j = 0; j < 5; j++)
+    for(let i = 0; i < size; ){
+        for(j = 0; j<4 && i < size; j++)
         {
-            allDivs[j+i].style.backgroundColor = FINAL_COLOR
+            allDivs[i].style.backgroundColor = FINAL_COLOR;
             i++;
         }
         await sleep(1)
     }
-    enableBtn()
+    enableBtn();
 }
 //Setting div colors for animations
 function divColor(divs, a, b, color){
